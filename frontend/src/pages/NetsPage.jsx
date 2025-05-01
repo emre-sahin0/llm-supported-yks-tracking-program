@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { FaBook, FaFlask, FaCalculator, FaCheckCircle, FaCalendarAlt } from 'react-icons/fa';
 
 const NetsPage = () => {
   const [netForm, setNetForm] = useState({
@@ -9,7 +10,6 @@ const NetsPage = () => {
   });
 
   const [kayitlar, setKayitlar] = useState([]);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchNets();
@@ -17,17 +17,10 @@ const NetsPage = () => {
 
   const fetchNets = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/nets', { 
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await axios.get('http://localhost:5000/nets', { withCredentials: true });
       setKayitlar(response.data);
-      setError('');
     } catch (err) {
       console.error('Net kayıtları alınamadı:', err);
-      setError('Net kayıtları alınamadı. Lütfen giriş yaptığınızdan emin olun.');
     }
   };
 
@@ -51,95 +44,95 @@ const NetsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/nets', netForm, { 
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      fetchNets(); // yeni kayıt sonrası güncelle
+      await axios.post('http://localhost:5000/nets', netForm, { withCredentials: true });
+      fetchNets();
       setNetForm({
         tarih: '',
         tyt: { turkce: '', matematik: '', sosyal: '', fen: '' },
         ayt: { matematik: '', fizik: '', kimya: '', biyoloji: '' },
       });
-      setError('');
     } catch (err) {
       console.error('Net kaydedilemedi:', err);
-      setError('Net kaydedilemedi. Lütfen giriş yaptığınızdan emin olun.');
     }
   };
 
+  const renderInput = (kategori, ders, label, Icon) => (
+    <div className="flex items-center space-x-2">
+      <Icon className="text-gray-500" />
+      <input
+        type="number"
+        placeholder={`${label} Net`}
+        value={netForm[kategori][ders]}
+        onChange={(e) => handleChange(kategori, ders, e.target.value)}
+        className="border p-2 rounded-lg w-full shadow-sm"
+      />
+    </div>
+  );
+
   return (
-    <div className="flex flex-col items-center justify-center space-y-8">
-      <h1 className="text-3xl font-bold text-purple-600">📈 Net Girişi</h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-100 py-10 px-4">
+      <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h1 className="text-3xl font-bold text-purple-600 text-center mb-6">📊 Net Girişi</h1>
+        <p className="text-center text-gray-500 mb-6">Son çalışma gününe ait netlerini kaydet!</p>
 
-      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <span className="block sm:inline">{error}</span>
-      </div>}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <input
+            type="text"
+            placeholder="Tarih (Örn: Nisan 2025)"
+            value={netForm.tarih}
+            onChange={handleTarihChange}
+            className="border p-3 rounded-lg w-full"
+          />
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md space-y-6 w-full max-w-4xl">
-        <input
-          type="text"
-          placeholder="Tarih (Örn: Nisan 2025)"
-          value={netForm.tarih}
-          onChange={handleTarihChange}
-          className="border p-2 rounded-lg w-full"
-        />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 p-4 rounded-lg shadow">
+              <h2 className="text-xl font-semibold text-purple-700 mb-4">TYT</h2>
+              {renderInput('tyt', 'turkce', 'Türkçe', FaBook)}
+              {renderInput('tyt', 'matematik', 'Matematik', FaCalculator)}
+              {renderInput('tyt', 'sosyal', 'Sosyal', FaCheckCircle)}
+              {renderInput('tyt', 'fen', 'Fen', FaFlask)}
+            </div>
 
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold">TYT</h2>
-            {['turkce', 'matematik', 'sosyal', 'fen'].map((ders) => (
-              <input
-                key={ders}
-                type="number"
-                placeholder={`${ders.charAt(0).toUpperCase() + ders.slice(1)} Net`}
-                value={netForm.tyt[ders]}
-                onChange={(e) => handleChange('tyt', ders, e.target.value)}
-                className="border p-2 rounded-lg w-full"
-              />
-            ))}
+            <div className="bg-gray-50 p-4 rounded-lg shadow">
+              <h2 className="text-xl font-semibold text-purple-700 mb-4">AYT</h2>
+              {renderInput('ayt', 'matematik', 'Matematik', FaCalculator)}
+              {renderInput('ayt', 'fizik', 'Fizik', FaFlask)}
+              {renderInput('ayt', 'kimya', 'Kimya', FaFlask)}
+              {renderInput('ayt', 'biyoloji', 'Biyoloji', FaFlask)}
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-xl font-semibold">AYT</h2>
-            {['matematik', 'fizik', 'kimya', 'biyoloji'].map((ders) => (
-              <input
-                key={ders}
-                type="number"
-                placeholder={`${ders.charAt(0).toUpperCase() + ders.slice(1)} Net`}
-                value={netForm.ayt[ders]}
-                onChange={(e) => handleChange('ayt', ders, e.target.value)}
-                className="border p-2 rounded-lg w-full"
-              />
-            ))}
-          </div>
-        </div>
+          <button type="submit" className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-lg text-lg">
+            Kaydet
+          </button>
+        </form>
+      </div>
 
-        <button type="submit" className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded-lg">
-          Kaydet
-        </button>
-      </form>
-
-      <div className="w-full max-w-5xl space-y-4">
+      <div className="max-w-3xl mx-auto mt-10 space-y-4">
         {kayitlar.map((k, index) => (
-          <div key={index} className="bg-white shadow-md p-4 rounded-lg">
-            <h3 className="font-bold">📅 {k.tarih}</h3>
-            <div className="grid grid-cols-2 gap-6 mt-2">
-              <div>
-                <h4 className="font-semibold">TYT</h4>
-                <p>Türkçe: {k.tyt.turkce}</p>
-                <p>Matematik: {k.tyt.matematik}</p>
-                <p>Sosyal: {k.tyt.sosyal}</p>
-                <p>Fen: {k.tyt.fen}</p>
+          <div key={index} className="bg-white shadow-lg rounded-xl border-l-4 border-purple-400 p-6 hover:scale-[1.02] transition transform duration-200">
+            <div className="flex items-center gap-2 text-purple-600 font-bold text-lg">
+              <FaCalendarAlt />
+              <span>{k.tarih}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+                <h4 className="font-semibold text-blue-600 mb-2">📘 TYT</h4>
+                <ul className="space-y-1 text-sm">
+                  <li>📚 Türkçe: {k.tyt.turkce}</li>
+                  <li>➗ Matematik: {k.tyt.matematik}</li>
+                  <li>🗺️ Sosyal: {k.tyt.sosyal}</li>
+                  <li>🔬 Fen: {k.tyt.fen}</li>
+                </ul>
               </div>
-              <div>
-                <h4 className="font-semibold">AYT</h4>
-                <p>Matematik: {k.ayt.matematik}</p>
-                <p>Fizik: {k.ayt.fizik}</p>
-                <p>Kimya: {k.ayt.kimya}</p>
-                <p>Biyoloji: {k.ayt.biyoloji}</p>
+              <div className="bg-gradient-to-br from-pink-50 to-purple-100 p-4 rounded-lg">
+                <h4 className="font-semibold text-purple-600 mb-2">📗 AYT</h4>
+                <ul className="space-y-1 text-sm">
+                  <li>➗ Matematik: {k.ayt.matematik}</li>
+                  <li>🧲 Fizik: {k.ayt.fizik}</li>
+                  <li>⚗️ Kimya: {k.ayt.kimya}</li>
+                  <li>🧬 Biyoloji: {k.ayt.biyoloji}</li>
+                </ul>
               </div>
             </div>
           </div>
