@@ -5,28 +5,32 @@ from config import Config
 from database import db
 from flask_login import LoginManager
 from models.user import User
+from models.net_record import NetRecord
 from utils.hash_utils import bcrypt
 from routes.auth_routes import auth_bp
 from routes.topic_routes import topic_bp
 from flask_cors import CORS
 from routes.net_routes import net_bp
 from routes.schedule_routes import schedule_bp
-from models.net import NetRecord
 
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Session ve CORS ayarları
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = False
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['REMEMBER_COOKIE_HTTPONLY'] = True
 app.config['REMEMBER_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_DOMAIN'] = None
+app.config['SESSION_COOKIE_PATH'] = '/'
 
+# CORS ayarları
 CORS(app, 
      supports_credentials=True, 
-     resources={r"/*": {"origins": "http://localhost:3000"}},
-     allow_headers=['Content-Type', 'Authorization'],
-     expose_headers=['Content-Type', 'Authorization'])
+     resources={r"/*": {"origins": ["http://localhost:3000"], "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"], "expose_headers": ["Content-Type", "Authorization"]}},
+     allow_credentials=True)
 
 
 
