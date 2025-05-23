@@ -10,3 +10,9 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(10), nullable=False)
     full_name = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    # İlişkiler (cascade delete için)
+    net_records = db.relationship('NetRecord', cascade='all, delete-orphan', backref='user')
+    questions = db.relationship('Question', cascade='all, delete-orphan', backref='user')
+    schedules = db.relationship('Schedule', cascade='all, delete-orphan', backref='user')
+    user_topics = db.relationship('UserTopic', cascade='all, delete-orphan', backref='user')
