@@ -17,7 +17,7 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Inst
 API_KEY = Config.HUGGINGFACE_API_KEY
 headers = {"Authorization": f"Bearer {API_KEY}"}
 
-GOOGLE_API_KEY = "AIzaSyByDKDkB3WXI2X-nsNEkSeVIC66fOKqjEQ"
+GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
 MODEL = "models/gemini-1.5-flash"
 API_URL_GOOGLE = f"https://generativelanguage.googleapis.com/v1/{MODEL}:generateContent?key={GOOGLE_API_KEY}"
 
@@ -117,7 +117,7 @@ def analyze():
         Not: Yanıtını Türkçe olarak ver ve çok kısa tut. Netlerdeki değişimi ve gelişimi özellikle vurgula.
         """
 
-        GOOGLE_API_KEY = "AIzaSyByDKDkB3WXI2X-nsNEkSeVIC66fOKqjEQ"
+        GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
         MODEL = "models/gemini-1.5-flash"
         API_URL_GOOGLE = f"https://generativelanguage.googleapis.com/v1/{MODEL}:generateContent?key={GOOGLE_API_KEY}"
         headers = {"Content-Type": "application/json"}
