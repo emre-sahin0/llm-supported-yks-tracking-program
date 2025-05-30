@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 import { useNavigate } from 'react-router-dom';
+import '../styles/backgrounds.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,8 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,6 +26,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       // Etüt merkezi seçilmişse ve anahtar girilmemişse hata ver
       if (formData.role === 'etut' && !formData.registration_key) {
@@ -30,7 +34,7 @@ const Register = () => {
         return;
       }
 
-      const response = await axios.post('http://localhost:5000/auth/register', formData, {
+      const response = await axiosInstance.post('/auth/register', formData, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -41,17 +45,18 @@ const Register = () => {
         navigate('/');
       }
     } catch (err) {
+      setLoading(false);
       setError(err.response?.data?.message || 'Kayıt sırasında bir hata oluştu');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold text-center mb-6">YKS Takip Programı - Kayıt Ol</h2>
+    <div className="min-h-screen flex items-center justify-center auth-background">
+      <div className="glass-card p-8 rounded-2xl shadow-2xl w-96">
+        <h2 className="text-3xl font-bold text-center mb-6 text-blue-700">YKS Takip Programı - Kayıt Ol</h2>
         
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 animate-shake" role="alert">
             <span className="block sm:inline">{error}</span>
           </div>
         )}
@@ -85,15 +90,25 @@ const Register = () => {
 
           <div>
             <label className="block text-gray-700">Şifre</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Şifreniz"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10"
+                placeholder="Şifreniz"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-2 text-gray-500 hover:text-blue-600"
+                tabIndex={-1}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
 
           <div>
@@ -126,8 +141,10 @@ const Register = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+            className={`w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200 flex items-center justify-center ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
+            disabled={loading}
           >
+            {loading ? <span className="loader mr-2"></span> : null}
             Kayıt Ol
           </button>
         </form>
@@ -144,6 +161,37 @@ const Register = () => {
           </p>
         </div>
       </div>
+      <style>{`
+        .loader {
+          border: 3px solid #f3f3f3;
+          border-top: 3px solid #3498db;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .animate-shake {
+          animation: shake 0.3s;
+        }
+        @keyframes shake {
+          0% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          50% { transform: translateX(5px); }
+          75% { transform: translateX(-5px); }
+          100% { transform: translateX(0); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.7s;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 };

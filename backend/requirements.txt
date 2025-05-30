@@ -7,3 +7,5 @@ Werkzeug==2.0.1
 SQLAlchemy==1.4.23
 flask-bcrypt
 psycopg2-binary
+openai==1.12.0
+requests==2.31.0

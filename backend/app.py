@@ -12,6 +12,7 @@ from routes.topic_routes import topic_bp
 from flask_cors import CORS
 from routes.net_routes import net_bp
 from routes.schedule_routes import schedule_bp
+from routes.ai_routes import ai_bp
 
 
 app = Flask(__name__)
@@ -54,8 +55,12 @@ app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(topic_bp, url_prefix='')
 app.register_blueprint(net_bp, url_prefix='')
 app.register_blueprint(schedule_bp, url_prefix='')
+app.register_blueprint(ai_bp, url_prefix='/api/ai')
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        print('--- ROUTES ---')
+        for rule in app.url_map.iter_rules():
+            print(rule)
     app.run(debug=True)
