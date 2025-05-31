@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axios';
+import { QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
 
 const groupBy = (data, type) => {
   const groups = {};
@@ -103,84 +104,91 @@ const QuestionsPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-yellow-600 mb-6">📝 Soru Takip</h1>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md space-y-4 w-full max-w-2xl mx-auto mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {['matematik', 'turkce', 'fen', 'sosyal'].map((ders) => (
-            <div key={ders} className="space-y-2">
-              <h2 className="text-lg font-semibold capitalize">{ders}</h2>
-              <div className="grid grid-cols-3 gap-2">
-                <input
-                  type="number"
-                  placeholder="Doğru"
-                  value={form[ders].dogru}
-                  onChange={(e) => handleChange(ders, 'dogru', e.target.value)}
-                  className="border p-2 rounded-lg text-sm"
-                />
-                <input
-                  type="number"
-                  placeholder="Yanlış"
-                  value={form[ders].yanlis}
-                  onChange={(e) => handleChange(ders, 'yanlis', e.target.value)}
-                  className="border p-2 rounded-lg text-sm"
-                />
-              </div>
-            </div>
-          ))}
+      <div className="relative bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 rounded-2xl shadow-2xl p-8 hover:scale-[1.025] hover:shadow-3xl transition-all duration-300 border border-blue-100 max-w-xl mx-auto">
+        <div className="absolute -top-5 -right-5 bg-blue-500 rounded-full p-3 shadow-lg">
+          <QuestionMarkCircleIcon className="h-8 w-8 text-white" />
         </div>
-        <button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg font-semibold text-base">
-          Kaydet
-        </button>
-      </form>
-      <div className="flex justify-end mb-4">
-        <select
-          value={filter}
-          onChange={e => setFilter(e.target.value)}
-          className="border rounded px-3 py-2 text-sm shadow"
-        >
-          {FILTERS.map(f => (
-            <option key={f.value} value={f.value}>{f.label}</option>
-          ))}
-        </select>
-      </div>
-      <div className="space-y-6">
-        {groupKeys.length === 0 && (
-          <div className="text-center text-gray-500 py-12">Kayıt bulunamadı.</div>
-        )}
-        {groupKeys.map((key, idx) => {
-          const group = grouped[key];
-          const total = group.reduce((acc, q) => acc + (q.count || 0), 0);
-          const correct = group.reduce((acc, q) => acc + (q.correct || 0), 0);
-          const ratio = total > 0 ? Math.round((correct / total) * 100) : 0;
-          return (
-            <div key={key} className="bg-white rounded-xl shadow p-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
-                <span className="text-lg font-bold text-yellow-700">{FILTERS.find(f => f.value === filter).label} {key.replace('W', ' - Hafta ')}</span>
-                <span className="text-sm text-gray-500">Toplam Soru: <b>{total}</b> | Doğru: <b>{correct}</b> | Başarı: <b>{ratio}%</b></span>
+        <h3 className="text-2xl font-extrabold text-blue-800 mb-6 tracking-tight flex items-center gap-2">
+          Soru Takip
+        </h3>
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md space-y-4 w-full max-w-2xl mx-auto mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {['matematik', 'turkce', 'fen', 'sosyal'].map((ders) => (
+              <div key={ders} className="space-y-2">
+                <h2 className="text-lg font-semibold capitalize">{ders}</h2>
+                <div className="grid grid-cols-3 gap-2">
+                  <input
+                    type="number"
+                    placeholder="Doğru"
+                    value={form[ders].dogru}
+                    onChange={(e) => handleChange(ders, 'dogru', e.target.value)}
+                    className="border p-2 rounded-lg text-sm"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Yanlış"
+                    value={form[ders].yanlis}
+                    onChange={(e) => handleChange(ders, 'yanlis', e.target.value)}
+                    className="border p-2 rounded-lg text-sm"
+                  />
+                </div>
               </div>
-              <table className="w-full text-xs mt-2">
-                <thead>
-                  <tr className="text-gray-500 border-b">
-                    <th className="py-1 px-2 text-left">Ders</th>
-                    <th className="py-1 px-2 text-left">Doğru</th>
-                    <th className="py-1 px-2 text-left">Toplam</th>
-                    <th className="py-1 px-2 text-left">Tarih</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {group.map((k, i) => (
-                    <tr key={i} className="border-b hover:bg-yellow-50">
-                      <td className="py-1 px-2 capitalize font-semibold">{k.lesson}</td>
-                      <td className="py-1 px-2">{k.correct}</td>
-                      <td className="py-1 px-2">{k.count}</td>
-                      <td className="py-1 px-2">{k.created_at ? k.created_at.substring(0, 10) : ''}</td>
+            ))}
+          </div>
+          <button type="submit" className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg font-semibold text-base">
+            Kaydet
+          </button>
+        </form>
+        <div className="flex justify-end mb-4">
+          <select
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+            className="border rounded px-3 py-2 text-sm shadow"
+          >
+            {FILTERS.map(f => (
+              <option key={f.value} value={f.value}>{f.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-6">
+          {groupKeys.length === 0 && (
+            <div className="text-center text-gray-500 py-12">Kayıt bulunamadı.</div>
+          )}
+          {groupKeys.map((key, idx) => {
+            const group = grouped[key];
+            const total = group.reduce((acc, q) => acc + (q.count || 0), 0);
+            const correct = group.reduce((acc, q) => acc + (q.correct || 0), 0);
+            const ratio = total > 0 ? Math.round((correct / total) * 100) : 0;
+            return (
+              <div key={key} className="bg-white rounded-xl shadow p-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2">
+                  <span className="text-lg font-bold text-yellow-700">{FILTERS.find(f => f.value === filter).label} {key.replace('W', ' - Hafta ')}</span>
+                  <span className="text-sm text-gray-500">Toplam Soru: <b>{total}</b> | Doğru: <b>{correct}</b> | Başarı: <b>{ratio}%</b></span>
+                </div>
+                <table className="w-full text-xs mt-2">
+                  <thead>
+                    <tr className="text-gray-500 border-b">
+                      <th className="py-1 px-2 text-left">Ders</th>
+                      <th className="py-1 px-2 text-left">Doğru</th>
+                      <th className="py-1 px-2 text-left">Toplam</th>
+                      <th className="py-1 px-2 text-left">Tarih</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          );
-        })}
+                  </thead>
+                  <tbody>
+                    {group.map((k, i) => (
+                      <tr key={i} className="border-b hover:bg-yellow-50">
+                        <td className="py-1 px-2 capitalize font-semibold">{k.lesson}</td>
+                        <td className="py-1 px-2">{k.correct}</td>
+                        <td className="py-1 px-2">{k.count}</td>
+                        <td className="py-1 px-2">{k.created_at ? k.created_at.substring(0, 10) : ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

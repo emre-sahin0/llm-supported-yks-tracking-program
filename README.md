@@ -1,86 +1,110 @@
-# YKS Takip Programı
+# YKS Takip & AI Quiz Platformu
 
-Bu proje, YKS'ye hazırlanan öğrenciler ve etüt merkezleri için geliştirilmiş bir takip programıdır.
+YKS'ye hazırlanan öğrenciler ve etüt merkezleri için geliştirilmiş, konu/performans takibi ve yapay zeka destekli quiz özellikleri sunan tam kapsamlı bir platformdur.
+
+---
 
 ## Özellikler
 
-- Öğrenci ve etüt merkezi kaydı
-- Net takibi
-- Konu takibi
-- Soru takibi
-- Program oluşturma
-- Dashboard ile genel görünüm
+### Genel
+- Öğrenci ve etüt merkezi kaydı (özel anahtar ile)
+- Güvenli oturum yönetimi (Flask-Login)
+- PostgreSQL tabanlı veri saklama
+
+### Öğrenci Paneli
+- **Net Takibi:** Sınav netlerinizi kaydedin ve gelişiminizi izleyin.
+- **Konu Takibi:** Hangi konuları tamamladığınızı işaretleyin.
+- **Soru Takibi:** Çözdüğünüz soru sayılarını ve detaylarını kaydedin.
+- **Program Oluşturma:** Kendi çalışma programınızı oluşturun.
+- **AI Quiz:** Tamamladığınız her konu için Gemini destekli, otomatik çoktan seçmeli quiz çözün ve anında geri bildirim alın.
+- **AI Analiz:** Performansınıza göre yapay zeka destekli çalışma önerileri alın.
+
+### Etüt Merkezi Paneli
+- Öğrenci yönetimi ve performans takibi
+- Toplu program ve konu atama
+
+### Modern Arayüz
+- Responsive ve kullanıcı dostu React arayüzü
+- Modern, kutulu quiz ve sonuç ekranları
+- Kolay kullanım ve hızlı erişim
+
+---
 
 ## Kurulum
 
-### Backend Kurulumu
+### 1. PostgreSQL Kurulumu
+- PostgreSQL sunucunuzu kurun ve bir veritabanı oluşturun.
+- Render, Railway gibi platformlarda canlıya alacaksanız, platformun verdiği bağlantı bilgisini kullanın.
 
-1. Python 3.9 veya üstü sürümünün yüklü olduğundan emin olun
-2. Backend klasörüne gidin:
-   ```bash
-   cd backend
-   ```
-3. Sanal ortam oluşturun ve aktif edin:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   venv\Scripts\activate     # Windows
-   ```
-4. Gerekli paketleri yükleyin:
-   ```bash
-   pip install -r requirements.txt
-   ```
-5. PostgreSQL veritabanını kurun ve `config.py` dosyasındaki bağlantı bilgilerini güncelleyin
-6. Uygulamayı başlatın:
-   ```bash
-   python app.py
-   ```
+### 2. Backend (Flask)
+```bash
+cd backend
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
+pip install -r requirements.txt
+```
+`.env` dosyanızı oluşturun ve aşağıdaki gibi doldurun:
+```
+SECRET_KEY=senin_secretin
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-1.5-flash
+POSTGRES_USER=...
+POSTGRES_PASSWORD=...
+POSTGRES_HOST=...
+POSTGRES_PORT=5432
+POSTGRES_DB=...
+```
+Uygulamayı başlatın:
+```bash
+python app.py
+```
 
-### Frontend Kurulumu
+### 3. Frontend (React)
+```bash
+cd frontend
+npm install
+npm start
+```
+Tarayıcıda `http://localhost:3000` adresine gidin.
 
-1. Node.js'in yüklü olduğundan emin olun
-2. Frontend klasörüne gidin:
-   ```bash
-   cd frontend
-   ```
-3. Bağımlılıkları yükleyin:
-   ```bash
-   npm install
-   ```
-4. Uygulamayı başlatın:
-   ```bash
-   npm start
-   ```
+---
 
-## Kullanım
+## Canlıya Alma (Render/Railway/Heroku)
+- Ortam değişkenlerini platform panelinden girin.
+- Backend için start komutu: `gunicorn app:app` veya `python app.py`
+- Frontend için: `npm run build` ve statik dosya servisi
+- CORS ayarlarını production domainlerine göre güncelleyin.
 
-1. Tarayıcıda `http://localhost:3000` adresine gidin
-2. Kayıt ol veya giriş yap
-3. Öğrenci olarak:
-   - Netlerinizi girebilirsiniz
-   - Konuları takip edebilirsiniz
-   - Soru çözümlerinizi kaydedebilirsiniz
-   - Programınızı oluşturabilirsiniz
+---
 
-4. Etüt merkezi olarak:
-   - Öğrencilerinizi yönetebilirsiniz
-   - Öğrenci performanslarını takip edebilirsiniz
-   - Program oluşturabilirsiniz
+## Kullanım Akışı
 
-## Güvenlik
+1. **Kayıt Ol / Giriş Yap**
+2. **Konu Takibi:** Konu kutucuğunu tamamladığınızda otomatik olarak AI Quiz başlar.
+3. **AI Quiz:** Gemini API ile o konuya özel 2 çoktan seçmeli soru çözersiniz, anında geri bildirim alırsınız.
+4. **Net ve Soru Takibi:** Netlerinizi ve çözdüğünüz soruları kaydedin.
+5. **AI Analiz:** Performansınıza göre yapay zeka önerileri alın.
 
-- Etüt merkezi kaydı için özel anahtar gereklidir
-- Şifreler güvenli bir şekilde hash'lenerek saklanır
-- Oturum yönetimi için Flask-Login kullanılır
+---
 
-## Katkıda Bulunma
+## Gelişmiş Özellikler
 
-1. Bu depoyu fork edin
-2. Yeni bir branch oluşturun (`git checkout -b feature/yeniOzellik`)
-3. Değişikliklerinizi commit edin (`git commit -am 'Yeni özellik eklendi'`)
-4. Branch'inizi push edin (`git push origin feature/yeniOzellik`)
-5. Pull Request oluşturun
+- **Yapay Zeka ile Quiz:** Gemini API ile otomatik, konuya özel, çoktan seçmeli sorular.
+- **Anında Geri Bildirim:** Doğru sayınıza göre motivasyonel mesajlar.
+- **Modern Tasarım:** Responsive, kutulu ve renkli quiz/sonuç ekranları.
+- **Kolay Entegrasyon:** Her ortamda kolayca deploy edilebilir yapı.
 
-## Lisans
+---
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın. 
+## Katkı ve Lisans
+
+- Katkı için fork/pull request adımlarını izleyin.
+- MIT Lisansı ile özgürce kullanabilirsiniz.
+
+---
+
+Her türlü soru ve katkı için iletişime geçebilirsiniz!  
+Kolay gelsin 🚀 

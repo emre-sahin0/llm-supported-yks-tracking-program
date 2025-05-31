@@ -13,6 +13,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import StudentManagement from './pages/StudentManagement';
 import PerformancePage from './pages/PerformancePage';
+import QuizPage from './pages/QuizPage';
 import './styles/backgrounds.css';
 import { AuthProvider } from './contexts/AuthContext';
 
@@ -38,6 +39,7 @@ function Layout() {
             <Route path="/student-management" element={<StudentManagement />} />
             <Route path="/performance" element={<PerformancePage />} />
             <Route path="/ai-consultant" element={<AIConsultantPage />} />
+            <Route path="/quiz" element={<QuizPage />} />
           </Routes>
         </div>
       </div>

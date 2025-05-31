@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axios';
 import { FaUserCircle, FaCamera } from 'react-icons/fa';
+import { Cog6ToothIcon } from '@heroicons/react/24/solid';
 
 const SettingsPage = () => {
   const [settings, setSettings] = useState({
@@ -98,124 +99,131 @@ const SettingsPage = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-blue-700 mb-8">Hesap Ayarları</h1>
-
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+      <div className="relative bg-gradient-to-br from-gray-100 via-blue-100 to-indigo-100 rounded-2xl shadow-2xl p-8 hover:scale-[1.025] hover:shadow-3xl transition-all duration-300 border border-gray-100 max-w-xl mx-auto">
+        <div className="absolute -top-5 -right-5 bg-gray-500 rounded-full p-3 shadow-lg">
+          <Cog6ToothIcon className="h-8 w-8 text-white" />
         </div>
-      )}
+        <h3 className="text-2xl font-extrabold text-gray-800 mb-6 tracking-tight flex items-center gap-2">
+          Ayarlar
+        </h3>
 
-      {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          {success}
-        </div>
-      )}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
 
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="flex flex-col items-center mb-8">
-          <div className="relative">
-            {settings.profile_photo ? (
-              <img
-                src={settings.profile_photo}
-                alt="Profil"
-                className="w-32 h-32 rounded-full object-cover"
-              />
-            ) : (
-              <FaUserCircle className="w-32 h-32 text-gray-400" />
-            )}
-            <label className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600">
-              <FaCamera />
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            {success}
+          </div>
+        )}
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative">
+              {settings.profile_photo ? (
+                <img
+                  src={settings.profile_photo}
+                  alt="Profil"
+                  className="w-32 h-32 rounded-full object-cover"
+                />
+              ) : (
+                <FaUserCircle className="w-32 h-32 text-gray-400" />
+              )}
+              <label className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600">
+                <FaCamera />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePhotoChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-gray-700 mb-2">Kullanıcı Adı</label>
               <input
-                type="file"
-                accept="image/*"
-                onChange={handleProfilePhotoChange}
-                className="hidden"
+                type="text"
+                value={settings.username}
+                disabled
+                className="w-full px-4 py-2 border rounded-lg bg-gray-100"
               />
-            </label>
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-2">Ad Soyad</label>
+              <input
+                type="text"
+                value={settings.full_name}
+                onChange={(e) => setSettings(prev => ({ ...prev, full_name: e.target.value }))}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+            >
+              Kaydet
+            </button>
+          </form>
+
+          <div className="mt-8">
+            <button
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="text-blue-500 hover:text-blue-700"
+            >
+              Şifre Değiştir
+            </button>
+
+            {showPasswordForm && (
+              <form onSubmit={handlePasswordChange} className="mt-4 space-y-4">
+                <div>
+                  <label className="block text-gray-700 mb-2">Mevcut Şifre</label>
+                  <input
+                    type="password"
+                    value={passwordForm.current_password}
+                    onChange={(e) => setPasswordForm(prev => ({ ...prev, current_password: e.target.value }))}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 mb-2">Yeni Şifre</label>
+                  <input
+                    type="password"
+                    value={passwordForm.new_password}
+                    onChange={(e) => setPasswordForm(prev => ({ ...prev, new_password: e.target.value }))}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 mb-2">Yeni Şifre (Tekrar)</label>
+                  <input
+                    type="password"
+                    value={passwordForm.confirm_password}
+                    onChange={(e) => setPasswordForm(prev => ({ ...prev, confirm_password: e.target.value }))}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+                >
+                  Şifreyi Güncelle
+                </button>
+              </form>
+            )}
           </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-700 mb-2">Kullanıcı Adı</label>
-            <input
-              type="text"
-              value={settings.username}
-              disabled
-              className="w-full px-4 py-2 border rounded-lg bg-gray-100"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 mb-2">Ad Soyad</label>
-            <input
-              type="text"
-              value={settings.full_name}
-              onChange={(e) => setSettings(prev => ({ ...prev, full_name: e.target.value }))}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200"
-          >
-            Kaydet
-          </button>
-        </form>
-
-        <div className="mt-8">
-          <button
-            onClick={() => setShowPasswordForm(!showPasswordForm)}
-            className="text-blue-500 hover:text-blue-700"
-          >
-            Şifre Değiştir
-          </button>
-
-          {showPasswordForm && (
-            <form onSubmit={handlePasswordChange} className="mt-4 space-y-4">
-              <div>
-                <label className="block text-gray-700 mb-2">Mevcut Şifre</label>
-                <input
-                  type="password"
-                  value={passwordForm.current_password}
-                  onChange={(e) => setPasswordForm(prev => ({ ...prev, current_password: e.target.value }))}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 mb-2">Yeni Şifre</label>
-                <input
-                  type="password"
-                  value={passwordForm.new_password}
-                  onChange={(e) => setPasswordForm(prev => ({ ...prev, new_password: e.target.value }))}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 mb-2">Yeni Şifre (Tekrar)</label>
-                <input
-                  type="password"
-                  value={passwordForm.confirm_password}
-                  onChange={(e) => setPasswordForm(prev => ({ ...prev, confirm_password: e.target.value }))}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-200"
-              >
-                Şifreyi Güncelle
-              </button>
-            </form>
-          )}
         </div>
       </div>
 

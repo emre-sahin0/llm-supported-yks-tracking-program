@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SortableItem from './SortableItem';
 import axiosInstance from '../utils/axios';
 import UpdateModal from '../components/UpdateModal';
+import { CalendarDaysIcon } from '@heroicons/react/24/solid';
 
 const LESSONS = [
   'Matematik',
@@ -203,75 +204,81 @@ const ProgramPage = () => {
   };
 
   return (
-    <div className="w-full bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 rounded-lg overflow-x-auto">
-      <div className="p-2 md:p-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2 md:mb-4">
-          <h1 className="text-xl md:text-3xl font-bold text-blue-700 mb-2 md:mb-0">Ders Programı</h1>
-          <select
-            value={selectedLesson}
-            onChange={handleLessonChange}
-            className="border p-1 md:p-2 rounded-lg text-base md:text-lg shadow-sm focus:ring-2 focus:ring-blue-400"
-          >
-            {LESSONS.map(lesson => (
-              <option key={lesson} value={lesson}>{lesson}</option>
-            ))}
-          </select>
-        </div>
-        {loading ? (
-          <div className="text-center text-gray-500">Yükleniyor...</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[600px] md:min-w-max w-full border-collapse text-xs md:text-sm">
-              <thead>
-                <tr>
-                  <th className="p-1 md:p-2 bg-blue-200 text-blue-900 border border-blue-300">Hafta</th>
-                  {MONTHS.map((month) => (
-                    <th key={month} className="p-1 md:p-2 bg-blue-200 text-blue-900 border border-blue-300">{month}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {WEEKS.map((week) => (
-                  <tr key={week}>
-                    <td className="p-1 md:p-2 bg-blue-50 border border-blue-100 text-center font-bold">{week}</td>
+    <div className="relative bg-gradient-to-br from-pink-100 via-red-100 to-yellow-100 rounded-2xl shadow-2xl p-4 md:p-8 hover:scale-[1.015] hover:shadow-3xl transition-all duration-300 border border-pink-100 max-w-full overflow-x-auto">
+      <div className="absolute -top-5 -right-5 bg-pink-500 rounded-full p-3 shadow-lg">
+        <CalendarDaysIcon className="h-8 w-8 text-white" />
+      </div>
+      <h3 className="text-xl md:text-2xl font-extrabold text-pink-800 mb-4 md:mb-6 tracking-tight flex items-center gap-2">
+        Çalışma Programı
+      </h3>
+      <div className="w-full bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 rounded-lg overflow-x-auto">
+        <div className="p-1 md:p-2">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-2 md:mb-4">
+            <h1 className="text-base md:text-2xl font-bold text-blue-700 mb-2 md:mb-0">Ders Programı</h1>
+            <select
+              value={selectedLesson}
+              onChange={handleLessonChange}
+              className="border p-1 md:p-2 rounded-lg text-sm md:text-base shadow-sm focus:ring-2 focus:ring-blue-400"
+            >
+              {LESSONS.map(lesson => (
+                <option key={lesson} value={lesson}>{lesson}</option>
+              ))}
+            </select>
+          </div>
+          {loading ? (
+            <div className="text-center text-gray-500">Yükleniyor...</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-[900px] w-full border-collapse text-xs md:text-sm">
+                <thead>
+                  <tr>
+                    <th className="p-1 md:p-2 bg-blue-200 text-blue-900 border border-blue-300">Hafta</th>
                     {MONTHS.map((month) => (
-                      <td
-                        key={month}
-                        onClick={() => handleCellClick(month, week)}
-                        className={`align-top min-w-[120px] md:min-w-[180px] bg-white border border-blue-100 ${
-                          selectedItem ? 'cursor-pointer hover:bg-blue-50' : ''
-                        }`}
-                      >
-                        {schedule[month][week].map((k) => (
-                          <SortableItem
-                            key={k.id}
-                            id={k.id}
-                            konu={k.konu}
-                            sure={k.sure}
-                            onMove={handleMove}
-                            onDelete={handleDelete}
-                            onEdit={handleEdit}
-                            isLastRow={week === WEEKS[WEEKS.length - 1]}
-                          />
-                        ))}
-                      </td>
+                      <th key={month} className="p-1 md:p-2 bg-blue-200 text-blue-900 border border-blue-300 text-xs md:text-sm">{month}</th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody>
+                  {WEEKS.map((week) => (
+                    <tr key={week}>
+                      <td className="p-1 md:p-2 bg-blue-50 border border-blue-100 text-center font-bold">{week}</td>
+                      {MONTHS.map((month) => (
+                        <td
+                          key={month}
+                          onClick={() => handleCellClick(month, week)}
+                          className={`align-top min-w-[80px] md:min-w-[120px] bg-white border border-blue-100 ${selectedItem ? 'cursor-pointer hover:bg-blue-50' : ''}`}
+                        >
+                          {schedule[month][week].map((k) => (
+                            <SortableItem
+                              key={k.id}
+                              id={k.id}
+                              konu={k.konu}
+                              sure={k.sure}
+                              onMove={handleMove}
+                              onDelete={handleDelete}
+                              onEdit={handleEdit}
+                              isLastRow={week === WEEKS[WEEKS.length - 1]}
+                            />
+                          ))}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        {/* Düzenle Modalı */}
+        <UpdateModal
+          isOpen={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          onSave={handleEditSave}
+          konu={editItem?.konu || ''}
+          mevcutGun={editItem?.sure || ''}
+          mevcutSaat={''}
+        />
       </div>
-      {/* Düzenle Modalı */}
-      <UpdateModal
-        isOpen={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        onSave={handleEditSave}
-        konu={editItem?.konu || ''}
-        mevcutGun={editItem?.sure || ''}
-        mevcutSaat={''}
-      />
     </div>
   );
 };

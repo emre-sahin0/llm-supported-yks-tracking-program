@@ -1,5 +1,8 @@
 ## === app.py ===
 from flask import Flask, jsonify
+from dotenv import load_dotenv
+from dotenv import load_dotenv
+import os
 
 from config import Config
 from database import db
@@ -13,8 +16,10 @@ from flask_cors import CORS
 from routes.net_routes import net_bp
 from routes.schedule_routes import schedule_bp
 from routes.ai_routes import ai_bp
+from routes.ai_questions import ai_questions_bp
 
 
+load_dotenv()
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -33,9 +38,9 @@ CORS(app,
      resources={r"/*": {"origins": ["http://localhost:3000"], "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"], "expose_headers": ["Content-Type", "Authorization"]}},
      allow_credentials=True)
 
-
-
-
+# Load environment variables
+print("POSTGRES_PASSWORD:", os.environ.get("POSTGRES_PASSWORD"))
+print("GEMINI_API_KEY:", os.environ.get("GEMINI_API_KEY"))
 
 # Init extensions
 db.init_app(app)
@@ -56,6 +61,7 @@ app.register_blueprint(topic_bp, url_prefix='')
 app.register_blueprint(net_bp, url_prefix='')
 app.register_blueprint(schedule_bp, url_prefix='')
 app.register_blueprint(ai_bp, url_prefix='/api/ai')
+app.register_blueprint(ai_questions_bp, url_prefix='/api/ai-questions')
 
 if __name__ == '__main__':
     with app.app_context():

@@ -9,6 +9,7 @@ import os
 import requests
 from config import Config
 from models.net_record import NetRecord
+from collections import defaultdict
 
 ai_bp = Blueprint('ai', __name__)
 
@@ -17,9 +18,9 @@ API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Inst
 API_KEY = Config.HUGGINGFACE_API_KEY
 headers = {"Authorization": f"Bearer {API_KEY}"}
 
-GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
-MODEL = "models/gemini-1.5-flash"
-API_URL_GOOGLE = f"https://generativelanguage.googleapis.com/v1/{MODEL}:generateContent?key={GOOGLE_API_KEY}"
+GOOGLE_API_KEY = Config.GEMINI_API_KEY
+MODEL = "gemini-1.5-flash"
+API_URL_GOOGLE = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={GOOGLE_API_KEY}"
 
 @ai_bp.route('/students/<int:student_id>/data', methods=['GET'])
 def get_student_data(student_id):
@@ -33,10 +34,10 @@ def get_student_data(student_id):
         print('All Questions:', db.session.query(Question).filter(Question.user_id == student_id).all())
         # Son 30 günlük soru çözüm sayısı
         thirty_days_ago = datetime.now() - timedelta(days=30)
-        monthly_questions = Question.query.filter(
+        monthly_questions = db.session.query(db.func.sum(Question.count)).filter(
             Question.user_id == student_id,
             Question.created_at >= thirty_days_ago
-        ).count()
+        ).scalar() or 0
 
         # Tüm net kayıtlarını çek
         net_records = db.session.query(NetRecord).filter(NetRecord.user_id == student_id).order_by(NetRecord.tarih).all()
@@ -67,12 +68,21 @@ def get_student_data(student_id):
                 daily_questions[date_str] = 0
             daily_questions[date_str] += question.count
 
+        # Son 6 ay için aylık toplam soru sayısı
+        monthly_question_counts = defaultdict(int)
+        all_questions = Question.query.filter(Question.user_id == student_id).all()
+        for q in all_questions:
+            if q.created_at:
+                month = q.created_at.strftime('%Y-%m')
+                monthly_question_counts[month] += q.count
+
         return jsonify({
             'totalQuestions': db.session.query(db.func.sum(Question.count)).filter(Question.user_id == student_id).scalar() or 0,
             'monthlyQuestions': monthly_questions,
             'netRecords': net_records_list,
             'completedTopics': [getattr(topic, 'name', getattr(topic, 'topic_title', '')) for topic in completed_topics],
-            'recentActivity': daily_questions
+            'recentActivity': daily_questions,
+            'monthlyQuestionCounts': dict(monthly_question_counts)
         })
     except Exception as e:
         import traceback
@@ -89,25 +99,33 @@ def analyze():
         if not student_id or not student_data:
             return jsonify({'message': 'Geçersiz veri formatı'}), 400
 
-        # Net kayıtlarını metin olarak hazırla
-        net_records_text = '\n'.join([
-            f"- {rec['tarih']} | {rec['exam_type']}: {rec['total_net']} net" for rec in student_data.get('netRecords', [])
-        ])
+        # Sadece bu ayın TYT ve AYT net kayıtlarını hazırla
+        from datetime import datetime
+        now = datetime.now()
+        this_month = now.strftime('%Y-%m')
+        this_month_records = [rec for rec in student_data.get('netRecords', []) if rec.get('tarih', '').startswith(this_month)]
+        tyt_records = [rec for rec in this_month_records if 'tyt' in (rec.get('exam_type') or '').lower()]
+        ayt_records = [rec for rec in this_month_records if 'ayt' in (rec.get('exam_type') or '').lower()]
+        net_records_text = ''
+        if tyt_records:
+            net_records_text += '\nTYT Sınavları:\n' + '\n'.join([
+                f"- {rec['tarih'][:10]} | {rec['exam_type']}: {rec['total_net']} net" for rec in tyt_records
+            ])
+        if ayt_records:
+            net_records_text += '\nAYT Sınavları:\n' + '\n'.join([
+                f"- {rec['tarih'][:10]} | {rec['exam_type']}: {rec['total_net']} net" for rec in ayt_records
+            ])
 
         # Danışman promptu oluştur
         prompt = f"""
-        Sen bir YKS hazırlık ve sınav danışmanısın. Aşağıdaki öğrenci verilerine ve net kayıtlarına göre kısa ve öz bir analiz yap:
+        Sen bir YKS hazırlık ve sınav danışmanısın. Aşağıdaki öğrenci verilerine ve bu ayın net kayıtlarına göre kısa ve öz bir analiz yap:
 
         Öğrenci Performans Verileri:
-        - Toplam Çözülen Soru: {student_data['totalQuestions']}
-        - Son 30 Günde Çözülen Soru: {student_data['monthlyQuestions']}
+        - Bu Ay Çözülen Soru: {student_data['monthlyQuestions']}
         - Tamamlanan Konular: {', '.join(student_data['completedTopics'])}
 
         Net Kayıtları (Tarih, Sınav Türü, Net):
         {net_records_text}
-
-        Son 7 Günlük Aktivite:
-        {chr(10).join([f'- {date}: {count} soru' for date, count in student_data.get('recentActivity', {}).items()])}
 
         Lütfen aşağıdaki formatta yanıt ver:
         1. Kısa Değerlendirme (2-3 cümle)
@@ -116,10 +134,9 @@ def analyze():
 
         Not: Yanıtını Türkçe olarak ver ve çok kısa tut. Netlerdeki değişimi ve gelişimi özellikle vurgula.
         """
+        print('AI PROMPT (Gemini):')
+        print(prompt)
 
-        GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY')
-        MODEL = "models/gemini-1.5-flash"
-        API_URL_GOOGLE = f"https://generativelanguage.googleapis.com/v1/{MODEL}:generateContent?key={GOOGLE_API_KEY}"
         headers = {"Content-Type": "application/json"}
         payload = {
             "contents": [

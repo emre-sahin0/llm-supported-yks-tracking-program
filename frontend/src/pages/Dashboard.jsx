@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axios';
 import { FaUsers, FaChartLine, FaBook, FaQuestionCircle } from 'react-icons/fa';
+import { ChartBarIcon } from '@heroicons/react/24/solid';
 
 const yksDate = new Date('2025-06-15T09:00:00');
 
@@ -80,10 +81,13 @@ const Dashboard = () => {
                     <h1 className="text-3xl font-bold mb-8">Etüt Merkezi Yönetim Paneli</h1>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div 
-                            className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition-shadow"
-                            onClick={() => navigate('/student-management')}
-                        >
+                        <div className="relative bg-gradient-to-br from-green-200 via-blue-100 to-yellow-100 rounded-2xl shadow-2xl p-8 hover:scale-[1.025] hover:shadow-3xl transition-all duration-300 border border-green-100">
+                            <div className="absolute -top-5 -right-5 bg-green-500 rounded-full p-3 shadow-lg">
+                                <ChartBarIcon className="h-8 w-8 text-white" />
+                            </div>
+                            <h3 className="text-2xl font-extrabold text-green-800 mb-6 tracking-tight flex items-center gap-2">
+                                Genel Performans
+                            </h3>
                             <div className="flex items-center mb-4">
                                 <FaUsers className="text-4xl text-blue-500 mr-4" />
                                 <h2 className="text-xl font-semibold">Öğrenci Yönetimi</h2>

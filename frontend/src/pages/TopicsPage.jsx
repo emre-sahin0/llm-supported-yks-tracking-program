@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axios';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useNavigate } from 'react-router-dom';
 
 const LESSONS = [
   { value: 'TYT Matematik', label: 'TYT Matematik' },
@@ -43,6 +45,7 @@ const TopicsPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTopic, setNewTopic] = useState('');
   const [addingPredefined, setAddingPredefined] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTopics(selectedLesson);
@@ -99,6 +102,8 @@ const TopicsPage = () => {
       try {
         await axiosInstance.post(`topics/${topic.id}/complete`, {}, { withCredentials: true });
         setTopics(topics.map(t => t.id === topic.id ? { ...t, completed: true } : t));
+        // Quiz sayfasına yönlendir
+        navigate(`/quiz?konu=${encodeURIComponent(topic.title)}`);
       } catch (err) {
         alert('Konu tamamlanamadı!');
       }
@@ -206,6 +211,15 @@ const TopicsPage = () => {
           </div>
         </div>
       )}
+      <div className="relative bg-gradient-to-br from-green-100 via-lime-100 to-emerald-100 rounded-2xl shadow-2xl p-8 hover:scale-[1.025] hover:shadow-3xl transition-all duration-300 border border-green-100 max-w-xl mx-auto">
+        <div className="absolute -top-5 -right-5 bg-green-500 rounded-full p-3 shadow-lg">
+          <CheckCircleIcon className="h-8 w-8 text-white" />
+        </div>
+        <h3 className="text-2xl font-extrabold text-green-800 mb-6 tracking-tight flex items-center gap-2">
+          Konu Tamamlama
+        </h3>
+        {/* ... diğer içerikler ... */}
+      </div>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axios';
 import { FaBook, FaFlask, FaCalculator, FaCheckCircle, FaCalendarAlt } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { ChartBarIcon } from '@heroicons/react/24/solid';
 
 const NetsPage = () => {
   const [netForm, setNetForm] = useState({
@@ -147,33 +148,41 @@ const NetsPage = () => {
           Net Performansını Görüntüle
         </Link>
       </div>
-      <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-lg mb-8">
-        <p className="text-center text-gray-500 mb-4">Son çalışma gününe ait netlerini kaydet!</p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="date"
-            value={netForm.tarih}
-            onChange={handleTarihChange}
-            className="border p-2 rounded-lg w-full text-sm"
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-3 rounded-lg shadow-sm">
-              <h2 className="text-lg font-semibold text-purple-700 mb-2">TYT</h2>
-              {renderInput('tyt', 'turkce', 'Türkçe', FaBook)}
-              {renderInput('tyt', 'matematik', 'Matematik', FaCalculator)}
-              {renderInput('tyt', 'sosyal', 'Sosyal', FaCheckCircle)}
-              {renderInput('tyt', 'fen', 'Fen', FaFlask)}
+      <div className="relative bg-gradient-to-br from-yellow-100 via-orange-100 to-pink-100 rounded-2xl shadow-2xl p-8 hover:scale-[1.025] hover:shadow-3xl transition-all duration-300 border border-yellow-100 max-w-xl mx-auto">
+        <div className="absolute -top-5 -right-5 bg-yellow-500 rounded-full p-3 shadow-lg">
+          <ChartBarIcon className="h-8 w-8 text-white" />
+        </div>
+        <h3 className="text-2xl font-extrabold text-yellow-800 mb-6 tracking-tight flex items-center gap-2">
+          Net Girişi
+        </h3>
+        <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-lg mb-8">
+          <p className="text-center text-gray-500 mb-4">Son çalışma gününe ait netlerini kaydet!</p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="date"
+              value={netForm.tarih}
+              onChange={handleTarihChange}
+              className="border p-2 rounded-lg w-full text-sm"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-3 rounded-lg shadow-sm">
+                <h2 className="text-lg font-semibold text-purple-700 mb-2">TYT</h2>
+                {renderInput('tyt', 'turkce', 'Türkçe', FaBook)}
+                {renderInput('tyt', 'matematik', 'Matematik', FaCalculator)}
+                {renderInput('tyt', 'sosyal', 'Sosyal', FaCheckCircle)}
+                {renderInput('tyt', 'fen', 'Fen', FaFlask)}
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg shadow-sm">
+                <h2 className="text-lg font-semibold text-purple-700 mb-2">AYT</h2>
+                {renderInput('ayt', 'matematik', 'Matematik', FaCalculator)}
+                {renderInput('ayt', 'fizik', 'Fizik', FaFlask)}
+                {renderInput('ayt', 'kimya', 'Kimya', FaFlask)}
+                {renderInput('ayt', 'biyoloji', 'Biyoloji', FaFlask)}
+              </div>
             </div>
-            <div className="bg-gray-50 p-3 rounded-lg shadow-sm">
-              <h2 className="text-lg font-semibold text-purple-700 mb-2">AYT</h2>
-              {renderInput('ayt', 'matematik', 'Matematik', FaCalculator)}
-              {renderInput('ayt', 'fizik', 'Fizik', FaFlask)}
-              {renderInput('ayt', 'kimya', 'Kimya', FaFlask)}
-              {renderInput('ayt', 'biyoloji', 'Biyoloji', FaFlask)}
-            </div>
-          </div>
-          <button type="submit" className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded-lg text-base font-semibold transition">Kaydet</button>
-        </form>
+            <button type="submit" className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded-lg text-base font-semibold transition">Kaydet</button>
+          </form>
+        </div>
       </div>
       <div className="max-w-3xl mx-auto space-y-2">
         {Object.entries(grouped).map(([date, records]) => (

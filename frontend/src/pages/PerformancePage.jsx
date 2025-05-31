@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../utils/axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ArrowTrendingUpIcon } from '@heroicons/react/24/solid';
 
 const TYT_LESSONS = [
   { value: 'turkce', label: 'Türkçe' },
@@ -82,6 +83,15 @@ const PerformancePage = () => {
         </LineChart>
       </ResponsiveContainer>
       {chartData.length === 0 && <div className="text-center text-gray-500 mt-8">Seçilen derse ait net kaydı bulunamadı.</div>}
+      <div className="relative bg-gradient-to-br from-indigo-100 via-blue-100 to-green-100 rounded-2xl shadow-2xl p-8 hover:scale-[1.025] hover:shadow-3xl transition-all duration-300 border border-indigo-100 max-w-xl mx-auto">
+        <div className="absolute -top-5 -right-5 bg-indigo-500 rounded-full p-3 shadow-lg">
+          <ArrowTrendingUpIcon className="h-8 w-8 text-white" />
+        </div>
+        <h3 className="text-2xl font-extrabold text-indigo-800 mb-6 tracking-tight flex items-center gap-2">
+          Net Performansı
+        </h3>
+        {/* ... diğer içerikler ... */}
+      </div>
     </div>
   );
 };
